@@ -1,8 +1,10 @@
 import "./App.css";
-import airportsJSON from "./airports";
-import { routesJSON } from "./routes_updated";
-import { createGraph } from "./getDistance";
-interface Route {
+import airportsJSON from "./data/airports";
+import { routesJSON } from "./data/routes_updated";
+import { GraphType } from "./AlgorithmTypes";
+import {createGraph, getAllPossibleRoutes} from './Algorithm'
+import {getAirportLatAndLong,addCoordinatesToRoutesObject,deg2rad,getDistanceFromLatLonInKm} from './utilFunctions'
+export interface Route {
   "source airport": string;
   "destination apirport": string;
 }
@@ -18,9 +20,9 @@ export interface UpdatedRoute extends Route {
   };
 }
 
-type routesType = Route[];
+export type routesType = Route[];
 
-type airport =
+export type airport =
   | {
       Number: number;
       "Facility name": string;
@@ -45,46 +47,23 @@ type airport =
 function App() {
   const airports: airport[] = airportsJSON;
   const routes: Route[] = routesJSON;
-  console.log(routes.slice(0, 10));
 
-  function getAirportLatAndLong(airport: string): {
-    lat: number | undefined;
-    long: number | undefined;
-  } {
-    const destinationAirport: airport | undefined = airports.find(
-      (air) => air.IATA === airport
-    );
-    // console.log(destinationAirport);
-    return {
-      lat: destinationAirport?.Lat,
-      long: destinationAirport?.Long,
-    };
-  }
+  const pipe =
+    (...fns: any): any =>
+    (args: any) =>
+      fns.reduce((arg: any, fn: any) => {
+        return fn(arg);
+      }, args);
 
-  function addCoordinatesToRoutesObject(routes: routesType): UpdatedRoute[] {
-    const newRoutes = routes.map((route) => {
-      const sourceAirportCoordinates = getAirportLatAndLong(
-        route["source airport"]
-      );
-      const destinationAirportCoordinates = getAirportLatAndLong(
-        route["destination apirport"]
-      );
-      return {
-        ...route,
-        destinationCoords: destinationAirportCoordinates,
-        sourceCoords: sourceAirportCoordinates,
-      };
-    });
+  const pipelineResult: any = pipe(
+    addCoordinatesToRoutesObject,
+    createGraph,
+    (x: any) => getAllPossibleRoutes(x, "PCL", "IQT")
+  )(routes.slice(0, 10));
 
-    console.log(newRoutes);
-    return newRoutes;
-  }
+  console.log("pipeline result", pipelineResult);
 
-  console.log(createGraph(addCoordinatesToRoutesObject(routes.slice(0, 10))));
-
-  // addCoordinatesToRoutesObject(routes.slice(0, 10));
-
-  console.log(getAirportLatAndLong("GKA"));
+  // getAllPossibleRoutes(createGraph(addCoordinatesToRoutesObject(routes)), "PCL", "IQT")
 
   return <div className='App'></div>;
 }
