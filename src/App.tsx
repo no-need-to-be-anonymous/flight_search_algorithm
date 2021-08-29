@@ -2,8 +2,12 @@ import "./App.css";
 import airportsJSON from "./data/airports";
 import { routesJSON } from "./data/routes_updated";
 import { GraphType } from "./AlgorithmTypes";
-import {createGraph, getAllPossibleRoutes} from './Algorithm'
-import {getAirportLatAndLong,addCoordinatesToRoutesObject,deg2rad,getDistanceFromLatLonInKm} from './utilFunctions'
+import { createGraph, getAllPossibleRoutes } from "./Algorithm";
+import {
+  addCoordinatesToRoutesObject,
+  deg2rad,
+  getDistanceFromLatLonInKm,
+} from "./utilFunctions";
 export interface Route {
   "source airport": string;
   "destination apirport": string;
@@ -51,19 +55,15 @@ function App() {
   const pipe =
     (...fns: any): any =>
     (args: any) =>
-      fns.reduce((arg: any, fn: any) => {
-        return fn(arg);
-      }, args);
+      fns.reduce((arg: any, fn: any) => fn(arg), args);
 
-  const pipelineResult: any = pipe(
+  const allPossibleRoutes: Array<[]> | [] = pipe(
     addCoordinatesToRoutesObject,
     createGraph,
-    (x: any) => getAllPossibleRoutes(x, "PCL", "IQT")
-  )(routes.slice(0, 10));
+    (x: any) => getAllPossibleRoutes(x, "IEV", "OZH")
+  )(routes);
 
-  console.log("pipeline result", pipelineResult);
-
-  // getAllPossibleRoutes(createGraph(addCoordinatesToRoutesObject(routes)), "PCL", "IQT")
+  console.log("pipeline result", allPossibleRoutes);
 
   return <div className='App'></div>;
 }

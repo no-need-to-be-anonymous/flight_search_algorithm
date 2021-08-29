@@ -1,7 +1,6 @@
 import { GraphType } from "./AlgorithmTypes";
 import { getDistanceFromLatLonInKm } from "./utilFunctions";
 
-
 //creates Graph for airports
 export const createGraph = (flights: any) => {
   const airportsGraph: GraphType = {};
@@ -69,7 +68,7 @@ export function getAllPossibleRoutes(
       }
       distance = distance + graph[current][neighborAIR];
 
-      if (!visited.has(neighborAIR)) {
+      if (!visited.has(neighborAIR) && currPath.length < 5) {
         if (neighborAIR === dest) {
           let currentPath: any = [...currPath, neighborAIR, { distance }];
           currentPath = currentPath.reduce(

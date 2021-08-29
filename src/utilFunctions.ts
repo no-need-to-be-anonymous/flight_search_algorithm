@@ -60,6 +60,6 @@ export function addCoordinatesToRoutesObject(
     };
   });
 
-  console.log(newRoutes);
+  // console.log(newRoutes);
   return newRoutes;
 }
